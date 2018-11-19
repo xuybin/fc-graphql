@@ -66,8 +66,8 @@ configure<PublishExtension> {
     groupId = "${project.group}"
     artifactId = "${project.name}"
     publishVersion = "${project.version}"
-    desc = "Function Compute Graphql Spring"
-    website = "https://github.com/xuybin/fc-graphql-spring"
+    desc = "Function Compute Graphql"
+    website = "https://github.com/xuybin/fc-graphql"
     dryRun = false
     override = true
 }

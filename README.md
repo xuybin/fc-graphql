@@ -2,23 +2,9 @@
 [![Build Status](https://travis-ci.org/xuybin/fc-graphql.svg?branch=master)](https://travis-ci.org/xuybin/fc-graphql)
 [![Download](https://api.bintray.com/packages/xuybin/maven/fc-graphql/images/download.svg) ](https://bintray.com/xuybin/maven/fc-graphql/_latestVersion)
 
-同时兼容Microservice和Serverless架构,基于fc+graphql-spring封装的基础类库
+Serverless Cloud Function && Microservice,based on [fc](https://github.com/aliyun/fc-java-libs) [graphql](https://github.com/graphql-java/graphql-java) [http4k](https://github.com/http4k/http4k)
 
-example: https://github.com/xuybin/fc-graphql-example
-
-## Serverless
-
-Aliyun Function Comput(支持)
-
-Tencent Cloud(计划支持)
-
-## Microservice
-### Docker Swarm环境下
-``` bash
-```
-### kubernetes环境下
-``` bash
-```
+[example](https://github.com/xuybin/fc-graphql-example)
 
 ## Using in your project
 ### Maven
