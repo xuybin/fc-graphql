@@ -1,0 +1,134 @@
+package com.github.xuybin.fc.graphql
+
+import com.aliyun.fc.runtime.FunctionComputeLogger
+import graphql.ExecutionInput
+import graphql.schema.DataFetchingEnvironment
+
+/**
+ * Created by xuybin@qq.com  2018/11/15 9:41.
+ * 封装上下文的接口
+ */
+class GContext {
+    /**
+     * Created by xuybin@qq.com  2018/11/15 9:41.
+     * 封装函数计算传递和配置读取的认证信息
+     */
+    class Token(
+        var accessKeyId: String = "",
+        var accessKeySecret: String = "",
+        var securityToken: String? = null
+    )
+    // 请求的唯一标识
+    var requestId: String = ""
+        private set
+
+    // 从函数计算传递或配置读取认证信息
+    var token: Token? = null
+        private set
+
+    // 从FunctionComputeLogger获取日志
+    private var fLog: FunctionComputeLogger? = null
+
+    fun getFLogger(): Logger? {
+        return fLog?.let {
+            object : Logger {
+                override fun trace(string: String) {
+                    it.trace(string)
+                }
+
+                override fun debug(string: String) {
+                    it.debug(string)
+                }
+
+                override fun info(string: String) {
+                    it.info(string)
+                }
+
+                override fun warn(string: String) {
+                    it.warn(string)
+                }
+
+                override fun error(string: String) {
+                    it.error(string)
+                }
+            }
+        }
+    }
+
+    fun fillFromFContext(fContext: com.aliyun.fc.runtime.Context): GContext {
+        token = fContext.executionCredentials.let {
+            Token(it.accessKeyId, it.accessKeySecret, it.securityToken)
+        }
+        requestId = fContext.requestId
+        fLog = fContext.logger
+        return this
+    }
+
+    // 参数名称和值的map
+    private var arguments: Map<String, Any> = emptyMap()
+    // 参数的定义顺序List
+    private var argumentNames: List<String> = emptyList()
+
+    // 从DataFetchingEnvironment通过顺序获取参数值
+    operator fun <T> get(index: Int): T {
+        return arguments.get(argumentNames[index]) as T
+    }
+
+
+    private var appContext: GApp? = null
+    fun getGApp(): GApp {
+        return appContext ?: throw GErrExecute(GErrType.UnknownGraphqlSchema, "GApp must initialization")
+    }
+
+    companion object {
+        private val instance by lazy {
+            GContext()
+        }
+
+        fun fromGApp(appContext: GApp): GContext {
+            instance.appContext = appContext
+            return instance
+        }
+
+        fun fromDataFetchingEnvironment(dfe: DataFetchingEnvironment): GContext {
+            return dfe.getContext<GContext>().also {
+                it.arguments = dfe.arguments
+                it.argumentNames = dfe.fieldDefinition.arguments.map { it.name }
+                if (it.requestId.isEmpty()) it.requestId = dfe.executionId.toString()
+            }
+        }
+    }
+
+    // build ExecutionInput
+    fun getExecutionInput(queryJson: String): ExecutionInput {
+        return getGApp().fromJson(queryJson).let {
+            ExecutionInput.newExecutionInput().query(it.query)
+                .operationName(it.operationName)
+                .context(this)
+                .variables(it.variables)
+                .build()
+        }
+    }
+
+}
+
+
+/**
+ * Created by xuybin@qq.com  2018/11/15 9:42.
+ * 封装函数计算传递和org.slf4j.LoggerFactory初始的日志接口
+ */
+interface Logger {
+    fun trace(string: String)
+
+    fun debug(string: String)
+
+    fun info(string: String)
+
+    fun warn(string: String)
+
+    fun error(string: String)
+
+    enum class Level {
+        TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+    }
+}
