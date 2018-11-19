@@ -19,7 +19,7 @@ import java.util.*
 fun main(args: Array<String>) {
     val appContext = ServiceLoader.load(GApp::class.java).first()
     val logger= LoggerFactory.getLogger(appContext::class.java)
-    appContext.init(*args)
+    appContext.init(args)
     logger.info("${appContext.javaClass.canonicalName} init ${args.joinToString()}")
     // 缓存1000次不同的query
     val cache: Cache<String, PreparsedDocumentEntry> = Caffeine.newBuilder().maximumSize(1000).build()

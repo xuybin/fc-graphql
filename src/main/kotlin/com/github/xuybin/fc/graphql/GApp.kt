@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
  */
 interface GApp {
 
-    fun init(vararg  args: String =emptyArray())
+    fun init(args: Array<String> =emptyArray())
 
     fun <T : Any> getBean(clazz: KClass<T>): T
 
