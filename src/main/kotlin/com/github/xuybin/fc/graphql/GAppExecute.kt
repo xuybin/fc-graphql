@@ -65,13 +65,14 @@ class GContext {
     }
 
     // 参数名称和值的map
-    private var arguments: Map<String, Any> = emptyMap()
+    public var arguments: Map<String, Any> = emptyMap()
     // 参数的定义顺序List
-    private var argumentNames: List<String> = emptyList()
+    public var argumentNames: List<String> = emptyList()
 
     // 从DataFetchingEnvironment通过顺序获取参数值
-    operator fun <T> get(index: Int): T {
-        return arguments.get(argumentNames[index]) as T
+    inline operator fun <reified T : Any> get(index: Int): T {
+        val json:String=arguments.get(argumentNames[index]).toString()
+        return getGApp().fromJson(json,T::class.java)
     }
 
 
@@ -101,7 +102,7 @@ class GContext {
 
     // build ExecutionInput
     fun getExecutionInput(queryJson: String): ExecutionInput {
-        return getGApp().fromJson(queryJson).let {
+        return getGApp().fromJson<GRequest>(queryJson,GRequest::class.java).let {
             ExecutionInput.newExecutionInput().query(it.query)
                 .operationName(it.operationName)
                 .context(this)

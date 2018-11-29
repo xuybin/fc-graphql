@@ -1,5 +1,6 @@
 package com.github.xuybin.fc.graphql
 
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 /**
@@ -17,7 +18,9 @@ interface GApp {
 
     fun toJson(src: Any?): String
 
-    fun fromJson(queryJson: String): GRequest
+    //fun fromJson(queryJson: String): GRequest
+
+    fun<T : Any> fromJson(json:String, typeOfT: Type): T
 
     fun getGSchema(): List<GSchema>
 
@@ -66,6 +69,6 @@ fun loadProperties(resPath: String): List<Pair<String, String>> {
 
 class GRequest(
     var query: String = ""
-    , var variables: Map<String, Any>?  = null
+    , var variables: Map<String, String>?  = null
     , var operationName: String? = null
 )
