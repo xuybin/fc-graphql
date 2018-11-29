@@ -81,10 +81,7 @@ class GContext {
             Double::class.java->arg as T
             else-> {
                 if (arg==null) arg as T
-                else {
-                    val jsonStr=getGApp().toJson(arg)
-                    getGApp().fromJson(jsonStr,T::class.java)
-                }
+                else getGApp().fromJson(getGApp().toJson(arg),T::class.java)
             }
         }
     }
