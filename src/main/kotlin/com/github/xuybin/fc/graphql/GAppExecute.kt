@@ -76,11 +76,6 @@ class GContext {
         return getGApp().fromJson(json,T::class.java)
     }
 
-    operator fun <T : Any> get(index: Int,typeOfT: Type): T {
-        val json:String=arguments.get(argumentNames[index]).toString()
-        return getGApp().fromJson(json,typeOfT)
-    }
-
     private var appContext: GApp? = null
     fun getGApp(): GApp {
         return appContext ?: throw GErrExecute(GErrType.UnknownGraphqlSchema, "GApp must initialization")
