@@ -3,6 +3,7 @@ package com.github.xuybin.fc.graphql
 import com.aliyun.fc.runtime.FunctionComputeLogger
 import graphql.ExecutionInput
 import graphql.schema.DataFetchingEnvironment
+import java.lang.reflect.Type
 
 /**
  * Created by xuybin@qq.com  2018/11/15 9:41.
@@ -75,6 +76,10 @@ class GContext {
         return getGApp().fromJson(json,T::class.java)
     }
 
+    operator fun <T : Any> get(index: Int,typeOfT: Type): T {
+        val json:String=arguments.get(argumentNames[index]).toString()
+        return getGApp().fromJson(json,typeOfT)
+    }
 
     private var appContext: GApp? = null
     fun getGApp(): GApp {
