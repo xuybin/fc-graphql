@@ -66,14 +66,14 @@ class GContext {
     }
 
     // 参数名称和值的map
-    public var arguments: Map<String, Any> = emptyMap()
+    public var arguments: Map<String, Any?> = emptyMap()
     // 参数的定义顺序List
     public var argumentNames: List<String> = emptyList()
 
     // 从DataFetchingEnvironment通过顺序获取参数值
-    inline operator fun <reified T : Any> get(index: Int): T? {
+    inline operator fun <reified T : Any?> get(index: Int): T {
         val json:String=arguments.get(argumentNames[index]).toString()
-        return if (json.isNullOrBlank()) null else getGApp().fromJson(json,T::class.java)
+        return  getGApp().fromJson(json,T::class.java)
     }
 
     private var appContext: GApp? = null

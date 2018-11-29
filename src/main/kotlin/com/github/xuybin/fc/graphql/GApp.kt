@@ -20,7 +20,7 @@ interface GApp {
 
     //fun fromJson(queryJson: String): GRequest
 
-    fun<T : Any> fromJson(json:String, typeOfT: Type): T
+    fun<T : Any?> fromJson(json:String, typeOfT: Type): T
 
     fun getGSchema(): List<GSchema>
 
@@ -69,6 +69,6 @@ fun loadProperties(resPath: String): List<Pair<String, String>> {
 
 class GRequest(
     var query: String = ""
-    , var variables: Map<String, Any>?  = null
+    , var variables: Map<String, Any?>?  = null
     , var operationName: String? = null
 )
