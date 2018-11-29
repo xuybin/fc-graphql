@@ -81,9 +81,18 @@ class GContext {
             Double::class.java->arg as T
             else-> {
                 if (arg==null) arg as T
-                else  getGApp().fromJson(getGApp().toJson(arg),T::class.java)
+                else {
+                    val jsonStr=getGApp().toJson(arg)
+                    getGApp().fromJson(jsonStr,T::class.java)
+                }
             }
         }
+    }
+
+    // T本身是泛型试,需要在外部传递构造和传递TypeToken<List<Object>>(){}.getType()
+    operator fun <T : Any?> get(index: Int,typeOfT: Type): T {
+        val arg= arguments.get(argumentNames[index])
+        return getGApp().fromJson(getGApp().toJson(arg),typeOfT)
     }
 
     private var appContext: GApp? = null
