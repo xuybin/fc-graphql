@@ -66,6 +66,6 @@ fun loadProperties(resPath: String): List<Pair<String, String>> {
 
 class GRequest(
     var query: String = ""
-    , var variables: Any? = null
+    , var variables: Map<String, Any>?  = null
     , var operationName: String? = null
 )
