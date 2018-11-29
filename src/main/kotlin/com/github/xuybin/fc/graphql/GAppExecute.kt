@@ -73,6 +73,7 @@ class GContext {
     // 从DataFetchingEnvironment通过顺序获取参数值
     inline operator fun <reified T : Any?> get(index: Int): T {
         val json:String=arguments.get(argumentNames[index]).toString()
+        println(json)
         return  getGApp().fromJson(json,T::class.java)
     }
 
