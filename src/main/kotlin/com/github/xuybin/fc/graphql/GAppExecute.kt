@@ -71,9 +71,9 @@ class GContext {
     public var argumentNames: List<String> = emptyList()
 
     // 从DataFetchingEnvironment通过顺序获取参数值
-    inline operator fun <reified T : Any> get(index: Int): T {
+    inline operator fun <reified T : Any> get(index: Int): T? {
         val json:String=arguments.get(argumentNames[index]).toString()
-        return getGApp().fromJson(json,T::class.java)
+        return if (json.isNullOrBlank()) null else getGApp().fromJson(json,T::class.java)
     }
 
     private var appContext: GApp? = null
