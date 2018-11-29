@@ -29,7 +29,7 @@ interface GResolver {
                         "${this.javaClass.canonicalName} must extends GSchema"
                     )
                     // 调用该解析方法
-                    it.value(gcontext.arguments)
+                    it.value(gcontext)
                 } catch (ex: GErr) {
                     throw ex.toGErrExecute()
                 } catch (ex: GErrExecute) {
