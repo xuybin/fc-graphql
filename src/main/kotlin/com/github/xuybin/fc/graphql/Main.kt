@@ -8,6 +8,8 @@ import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.public
+import org.http4k.filter.CorsPolicy
+import org.http4k.filter.ServerFilters
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.ApacheServer
@@ -18,7 +20,7 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val appContext = ServiceLoader.load(GApp::class.java).first()
-    val logger= LoggerFactory.getLogger(appContext::class.java)
+    val logger = LoggerFactory.getLogger(appContext::class.java)
     appContext.init(args)
     logger.info("${appContext.javaClass.canonicalName} init ${args.joinToString()}")
     // 缓存1000次不同的query
@@ -50,7 +52,15 @@ fun main(args: Array<String>) {
                     }
                 )
             }
-        })
+        }).withFilter(
+        ServerFilters.Cors(
+            CorsPolicy(
+                listOf("*"),
+                listOf("content-type"),
+                listOf(Method.POST)
+            )
+        )
+    )
         .asServer(ApacheServer(appContext.serverPort()))
         .start()
     logger.info("start server at ${appContext.serverPort()}")
