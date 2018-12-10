@@ -55,9 +55,9 @@ fun main(args: Array<String>) {
         }).withFilter(
         ServerFilters.Cors(
             CorsPolicy(
-                listOf("graphql.gshbzw.com"),
+                listOf("*.gshbzw.com", "127.0.0.1", "localhost"),
                 listOf("content-type"),
-                listOf(Method.POST)
+                listOf(Method.POST, Method.HEAD, Method.GET)
             )
         )
     )
