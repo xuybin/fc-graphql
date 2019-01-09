@@ -17,7 +17,7 @@ plugins {
     id("bintray-release") version "SNAPSHOT-9"
 }
 
-version = "1.2.3"
+version = "1.2.4"
 group = "com.github.xuybin"
 
 application {

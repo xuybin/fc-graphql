@@ -31,10 +31,13 @@ interface GResolver {
                     // 调用该解析方法
                     it.value(gcontext)
                 } catch (ex: GErr) {
+                    ex.printStackTrace()
                     throw ex.toGErrExecute()
                 } catch (ex: GErrExecute) {
+                    ex.printStackTrace()
                     throw ex
                 } catch (ex: Throwable) {
+                    ex.printStackTrace()
                     throw GErrExecute(GErrType.Unknown, ex.message)
                 }
             })
