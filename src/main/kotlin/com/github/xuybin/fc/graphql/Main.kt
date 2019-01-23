@@ -20,6 +20,12 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val appContext = ServiceLoader.load(GApp::class.java).first()
+    // 初始化
+    val logger = LoggerFactory.getLogger(appContext::class.java)
+    appContext.init(args)
+    logger.info("${appContext.javaClass.canonicalName} init ${args.joinToString()}")
+
+    // 获取启动配置
     var serverPort = -1
     var origins = mutableSetOf<String>()
     var headers = mutableSetOf<String>()
@@ -65,9 +71,6 @@ fun main(args: Array<String>) {
     } catch (ex: Throwable) {
     }
 
-    val logger = LoggerFactory.getLogger(appContext::class.java)
-    appContext.init(args)
-    logger.info("${appContext.javaClass.canonicalName} init ${args.joinToString()}")
     // 缓存1000次不同的query
     val cache: Cache<String, PreparsedDocumentEntry> = Caffeine.newBuilder().maximumSize(1000).build()
     val graphQL = GraphQL.newGraphQL(appContext.initGraphqlSchema())
