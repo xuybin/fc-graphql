@@ -1,5 +1,6 @@
 package com.github.xuybin.fc.graphql
 
+import java.io.InputStream
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
@@ -31,31 +32,27 @@ interface GApp {
     fun version(): List<String> {
         val versions = mutableListOf<String>()
         try {
-            loadProperties("/com/github/xuybin/fc/graphql/defaults.properties").forEach {
-                if (it.first.startsWith("version")) versions.add(it.second)
+            loadProperties(GRequest::class.java,"/com/github/xuybin/fc/graphql/defaults.properties").forEach {
+                if (it.first.startsWith("fcg.version")) versions.add(it.second)
             }
         } catch (ex: Throwable) { }
         try {
-            loadProperties("bootstrap.properties").forEach {
-                if (it.first.startsWith("version")) versions.add(it.second)
+            loadProperties(this::class.java,"bootstrap.properties").forEach {
+                if (it.first.startsWith("fcg.version")) versions.add(it.second)
             }
         } catch (ex: Throwable) { }
         try {
-            loadProperties("application.properties").forEach {
-                if (it.first.startsWith("version")) versions.add(it.second)
+            loadProperties(this::class.java,"application.properties").forEach {
+                if (it.first.startsWith("fcg.version")) versions.add(it.second)
             }
         } catch (ex: Throwable) { }
         return versions
     }
-
-    fun serverPort():Int{
-        return 8080
-    }
 }
 
-fun loadProperties(resPath: String): List<Pair<String, String>> {
+fun loadProperties(classz:Class<*>,resPath: String): List<Pair<String, String>> {
     val properties = mutableListOf<Pair<String, String>>()
-    GRequest::class.java.getResourceAsStream(resPath).bufferedReader().use {
+    classz.getResourceAsStream(resPath).bufferedReader().use {
         it.readLines().forEach {
             "(\\S+)[ \\f\\t]*=[ \\f\\t]*(\\S*)[ \\f\\t]*".toRegex().matchEntire(it)?.run {
                 if (groupValues.size == 3) {

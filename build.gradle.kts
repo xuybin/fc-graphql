@@ -4,7 +4,7 @@ buildscript {
     mapOf(
         "graphql" to "com.graphql-java:graphql-java:11.0"
         , "aliyunFc" to "com.aliyun.fc.runtime:fc-java-core:1.2.0"
-        , "http4k" to "org.http4k:http4k-server-apache:3.103.2"
+        , "http4k" to "org.http4k:http4k-server-apache:3.107.0"
         ,  "caffeine" to "com.github.ben-manes.caffeine:caffeine:2.6.2"
     ).entries.forEach {
         extra.set(it.key, parent?.extra?.run { if (has(it.key)) get(it.key) else null } ?: it.value)
@@ -17,7 +17,7 @@ plugins {
     id("bintray-release") version "SNAPSHOT-9"
 }
 
-version = "1.2.4"
+version = "1.2.6"
 group = "com.github.xuybin"
 
 application {

@@ -20,6 +20,51 @@ import java.util.*
 
 fun main(args: Array<String>) {
     val appContext = ServiceLoader.load(GApp::class.java).first()
+    var serverPort = -1
+    var origins = mutableSetOf<String>()
+    var headers = mutableSetOf<String>()
+    var methods = mutableSetOf<Method>()
+    var corsUrl=""
+    val fiter: (Pair<String, String>) -> Unit = {
+        if (it.first.equals("fcg.cors-url") && corsUrl.isBlank()) corsUrl = it.second.trim()
+        if (it.first.equals("fcg.port") && (serverPort < 0 || serverPort > 65536)) serverPort = it.second.toInt()
+        if (it.first.equals("fcg.cors-policy.origins") && origins.isEmpty()) origins.addAll(it.second.split(",").mapNotNull { v->if (v.isNotBlank()) v else null })
+        if (it.first.equals("fcg.cors-policy.headers") && headers.isEmpty()) headers.addAll(it.second.split(",").mapNotNull { v->if (v.isNotBlank()) v else null })
+        if (it.first.equals("fcg.cors-policy.methods") && methods.isEmpty()) methods.addAll(it.second.split(",").mapNotNull { v ->
+            when {
+                v.equals(Method.GET.name, true) -> Method.GET
+                v.equals(Method.POST.name, true) -> Method.POST
+                v.equals(Method.PUT.name, true) -> Method.PUT
+                v.equals(Method.DELETE.name, true) -> Method.DELETE
+                v.equals(Method.OPTIONS.name, true) -> Method.OPTIONS
+                v.equals(Method.TRACE.name, true) -> Method.TRACE
+                v.equals(Method.PATCH.name, true) -> Method.PATCH
+                v.equals(Method.PURGE.name, true) -> Method.PURGE
+                v.equals(Method.HEAD.name, true) -> Method.HEAD
+                else -> null
+            }
+        })
+    }
+    // 按application.properties->bootstrap.properties->defaults.properties顺序，以优先取到的配置为准
+    try {
+        loadProperties(appContext::class.java, "application.properties").forEach {
+            fiter(it)
+        }
+    } catch (ex: Throwable) {
+    }
+    try {
+        loadProperties(appContext::class.java, "bootstrap.properties").forEach {
+            fiter(it)
+        }
+    } catch (ex: Throwable) {
+    }
+    try {
+        loadProperties(GRequest::class.java, "/com/github/xuybin/fc/graphql/defaults.properties").forEach {
+            fiter(it)
+        }
+    } catch (ex: Throwable) {
+    }
+
     val logger = LoggerFactory.getLogger(appContext::class.java)
     appContext.init(args)
     logger.info("${appContext.javaClass.canonicalName} init ${args.joinToString()}")
@@ -30,7 +75,8 @@ fun main(args: Array<String>) {
         .build()
     routes(
         "/graphiql.html" bind Method.GET to {
-            Response(Status.OK).public().body(graphiqlHtml)
+            // corsUrl 用于跨域测试，典型的设置成http://localhost/graphql 但网页上访问http://127.0.0.1/graphiql.html
+            Response(Status.OK).public().body(if (corsUrl.isNotBlank()) graphiqlHtml.replace("'/graphql'",corsUrl) else graphiqlHtml)
         },
         "/graphql" bind Method.POST to {
             try {
@@ -52,18 +98,21 @@ fun main(args: Array<String>) {
                     }
                 )
             }
-        }).withFilter(
-        ServerFilters.Cors(
-            CorsPolicy(
-                listOf("*"),
-                listOf("content-type"),
-                listOf(Method.POST, Method.HEAD, Method.GET)
+        }).apply {
+        if (origins.isNotEmpty() || headers.isNotEmpty() || methods.isNotEmpty())
+            withFilter(
+                ServerFilters.Cors(
+                    CorsPolicy(
+                        origins.toList(),
+                        headers.toList(),
+                        methods.toList()
+                    )
+                )
             )
-        )
-    )
-        .asServer(ApacheServer(appContext.serverPort()))
+    }
+        .asServer(ApacheServer(serverPort))
         .start()
-    logger.info("start server at ${appContext.serverPort()}")
+    logger.info("start server at ${serverPort}")
 }
 
 val graphiqlHtml = """
