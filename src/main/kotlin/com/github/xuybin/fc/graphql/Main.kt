@@ -53,13 +53,13 @@ fun main(args: Array<String>) {
     }
     // 按application.properties->bootstrap.properties->defaults.properties顺序，以优先取到的配置为准
     try {
-        loadProperties(appContext::class.java, "application.properties").forEach {
+        loadProperties(appContext::class.java, "/application.properties").forEach {
             fiter(it)
         }
     } catch (ex: Throwable) {
     }
     try {
-        loadProperties(appContext::class.java, "bootstrap.properties").forEach {
+        loadProperties(appContext::class.java, "/bootstrap.properties").forEach {
             fiter(it)
         }
     } catch (ex: Throwable) {

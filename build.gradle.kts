@@ -13,11 +13,11 @@ buildscript {
 
 plugins {
     application
-    kotlin("jvm") version "1.3.11"
+    kotlin("jvm") version "1.3.20"
     id("bintray-release") version "SNAPSHOT-9"
 }
 
-version = "1.2.7"
+version = "1.2.8"
 group = "com.github.xuybin"
 
 application {
